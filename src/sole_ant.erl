@@ -12,7 +12,7 @@
 
 
 %% API
--export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3]).
+-export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3, handle_call/3]).
 
 start_link(InState) ->
     gen_statem:start_link(?MODULE, InState, []).
@@ -37,6 +37,10 @@ callback_mode() ->
   state_functions.
 
 handle_info(stop_sign, _SName, State) ->
+  {stop, normal, State};
+
+handle_info(rain_shutdown, _State, State) ->
+  stream_of_creation:notify(ant, hit_by_rain, State),
   {stop, normal, State};
 
 handle_info(_Info, SName, State) ->
@@ -164,3 +168,16 @@ where_is_food(Pheromone) ->
   catch
     exit: _Reason -> where_is_food(Pheromone)
   end.
+
+handle_event({are_you_there, Place}, _From, State) ->
+  {X, Y} = {(State#ant.place)#place.x, (State#ant.place)#place.y},
+  Is = case {Place#place.x, Place#place.y} of
+         {X, Y} -> true;
+          _     -> false
+       end,
+  case Is of
+    true ->
+      erlang:send_after(15, self(), rain_shutdown);
+    false -> stream_of_creation:notify(ant, ant_not_hit_by_rain, State)
+  end,
+  {ok, loop, State, 300}.
