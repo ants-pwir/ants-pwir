@@ -10,7 +10,7 @@
 -behavior(supervisor).
 
 %% API
--export([ start_link/1, init/1, breed/1, kill_children/0, check_ant/ ]).
+-export([ start_link/1, init/1, breed/1, kill_children/0]).
 
 start_link(WorldData) ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, WorldData).
