@@ -11,7 +11,7 @@
 
 
 %% API
--export([ start_link/1, init/1, populate/1, restart/0, make_rain/1, destroy_rain/0 ]).
+-export([ start_link/1, init/1, populate/1, restart/0, make_rain/1, destroy_that_rain/0 ]).
 
 start_link(WorldData) ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, WorldData).
@@ -51,7 +51,7 @@ make_rain(Parametres) ->
   super_raindrop:make_rain(Parametres),
   done.
 
-destroy_rain() ->
+destroy_that_rain() ->
   super_raindrop:kill_children(),
   done.
 

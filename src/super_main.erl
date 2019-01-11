@@ -9,8 +9,6 @@
 -module(super_main).
 -behavior(supervisor).
 
-%add a make_rain function, that makes the raindrops fall - controls
-
 %% API
 -export([start_link/1, init/1, populate/1, kill_everyone/0, make_rain/1, destroy_rain/0]).
 
@@ -27,7 +25,7 @@ make_rain(Data) ->
   super_super:make_rain(Data).
 
 destroy_rain() ->
-  super_super:destroy_rain().
+  super_super:destroy_that_rain().
 
 init(WorldData) ->
   Arg = [ WorldData ],

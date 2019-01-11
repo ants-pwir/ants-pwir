@@ -87,9 +87,10 @@ handle_call(stop_ants, _From, {started, Rain, State}) ->
 handle_call(stop_ants, _From, {stopped, _Rain, _WorldData} = State) ->
   {reply, already_stopped, State};
 
-handle_call(get_data, _From, {StateName, WorldData} = State) ->
+handle_call(get_data, _From, {StateName, RainState, WorldData} = State) ->
   Width = WorldData#world_data.width,
   Height = WorldData#world_data.height,
   IsStarted = StateName =:= started,
+  IsRaining = RainState,
 
-  {reply, { {width, Width}, {height, Height}, {simulation_started, IsStarted} }, State}.
+  {reply, { {width, Width}, {height, Height}, {simulation_started, IsStarted}, {rain_started, IsRaining} }, State}.

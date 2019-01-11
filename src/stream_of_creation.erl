@@ -10,7 +10,7 @@
 
 -export([ start_link/0,
   part_ready/1,
-  notify/3, notify/4,
+  notify/3, notify/4, notify/2,
   add_handler/1,
   subtract_handler/1]).
 
@@ -35,6 +35,9 @@ notify(Name, Action, State) ->
 
 notify(Name, PID, Action, State) ->
   gen_event:notify(?MODULE, {Name, PID, Action, State}).
+
+notify(Name, Action) ->
+  gen_event:notify(?MODULE,{Name, Action}).
 
 %I'm not entirely sure, whether I won't get any weird bugs (:D) because of add_handler
 %let's see, anyways

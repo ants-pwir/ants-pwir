@@ -10,9 +10,16 @@
 -behavior(gen_statem).
 -include("parametres.hrl").
 
+%uwagi piwowarczyka(do kogoś innego): program nie może się kończyć na wyjątku
+%lekki interfejs się przyda
+%mam błąd error:function_clause przy likwidacji mrówek, przepraszam :O
+%naprawię go dzisiaj
+
+%dodać zachowanie mrówek, kiedy zaczyna się deszcz
+%czyli notify wszystkie, żeby wróciły do swoich kolonii
 
 %% API
--export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3]).
+-export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3,handle_event/4]).
 
 start_link(InState) ->
     gen_statem:start_link(?MODULE, InState, []).
@@ -27,7 +34,7 @@ init({WorldData, Place}) ->
 %here                    |   |
 %                       \     /
 %                        \   /
-    {ok, loop, State, 300}.
+    {ok, loop, State, 900}.
 
 terminate(_, _SName, State) ->
   stream_of_creation:notify(ant, an_ant_has_died, State),
@@ -35,6 +42,10 @@ terminate(_, _SName, State) ->
 
 callback_mode() ->
   state_functions.
+
+handle_event(info,rain_shutdown,State,Data) ->
+  io:format("EtventType : ~p~nEventContent : ~p~nState : ~p~nData : ~p~n", [info,rain_shutdown,State,Data]),
+  {stop,normal,State}.
 
 handle_info(stop_sign, _SName, State) ->
   {stop, normal, State};
@@ -82,9 +93,9 @@ loop(timeout, _, State) ->
   RainEntity = is_there_rain(State),
   case RainEntity of
     {something} ->  erlang:send_after(5, self(), rain_shutdown);
-      _-> stream_of_creation:notify(oooooo, oooooo, State)
+    _-> stream_of_creation:notify(oooooo, oooooo, State)
   end,
-  {next_state, loop,NState,300}.
+  {next_state, loop, NState,900}.
 
 get_new_target(State, {nothing}, _NewPlace, {position, X, Y}) ->
   stream_of_creation:notify(ant, pheromone_noticed, State),

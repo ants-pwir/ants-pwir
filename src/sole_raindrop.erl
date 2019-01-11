@@ -12,7 +12,7 @@
 
 -behavior(gen_server).
 
--export([ init/1, terminate/2, code_change/3, start_link/1, handle_cast/2, handle_info/2, handle_call/3]).
+-export([ init/1, terminate/3, code_change/3, start_link/1, handle_cast/2, handle_info/2, handle_call/3]).
 
 start_link(WorldData) ->
   gen_server:start_link(?MODULE, WorldData, []).
@@ -24,20 +24,20 @@ init(WorldData) ->
   State = #rain{pid = self(),
     place = #place{x = X, y = Y}},
   stream_of_creation:notify(rain, fell_on, State),
-  {ok,State,30}.
+  {ok,State,900}.
 
-terminate(_, State) ->
-  stream_of_creation:notify(rain, has_stopped_falling, State),
-  ok.
+terminate(_, _SName, _State) ->
+  {normal,shutdown}.
 
 code_change(_Old, State, _Add) ->
-  {ok, State,30}.
+  {ok, State}.
 
 handle_cast(_Ask, State) ->
-  {noreply, State,30}.
+  {noreply, State}.
 
 handle_info(stop_sign, State) ->
-  {stop, normal, State,30};
+  stream_of_creation:notify(rain, has_stopped_falling, State),
+  {stop, normal, State};
 
 handle_info(timeout, State) ->
   Width = ?WORLD_WIDTH,
@@ -45,12 +45,13 @@ handle_info(timeout, State) ->
   X =  rand:uniform(Width - 1),
   Y = rand:uniform(Height - 1),
   NewPlace = #place{x=X, y=Y},
+  %muszę coś zrobić, żeby po timeoucie nie zmieniały się współrzędne i żeby nie spadał znowu
   NewState = State#rain{place = NewPlace},
   stream_of_creation:notify(rain, falls_again, NewState),
-  {noreply,NewState,30};
+  {noreply,NewState,900};
 
 handle_info(_Inf, State) ->
-  {noreply, State,30}.
+  {noreply, State}.
 
 handle_call({are_you_at, Place}, _From, State) ->
   {X, Y} = {(State#rain.place)#place.x, (State#rain.place)#place.y},
@@ -58,5 +59,5 @@ handle_call({are_you_at, Place}, _From, State) ->
           {X, Y} -> true;
           _      -> false
         end,
-  {reply, Ans, State}.
+  {reply, Ans, State,900}.
 
