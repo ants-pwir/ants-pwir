@@ -3,10 +3,15 @@
 %Or maybe a smaller one
 
 -define(MIN_ANTS, 2).
--define(MAX_ANTS, 50).
+-define(MAX_ANTS, 5).
 -define(AVAILABLE_FOOD, 20).
 -define(PHEROMONE_TIME, 24000).
-
+%-define(RAIN_TIME, 24000).
+-define(RAIN_DENSITY, 10).
+-define(COLONY_SIZE, 3).
+-define(WORLD_WIDTH, 15).
+-define(WORLD_HEIGHT,15).
+-define(IS_RAINING,false).
 
 %And there you have basic records
 
@@ -19,3 +24,4 @@
 -record(colony, {place, ant_population}).
 -record(food, {pid, size, place, available}).
 -record(pheromone, {pid, place, food_place, size}).
+-record(rain, {pid, place}).

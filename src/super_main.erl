@@ -10,7 +10,7 @@
 -behavior(supervisor).
 
 %% API
--export([start_link/1, init/1, populate/1, kill_everyone/0]).
+-export([start_link/1, init/1, populate/1, kill_everyone/0, make_rain/1, destroy_rain/0]).
 
 start_link(WorldData) ->
   supervisor: start_link({local, ?MODULE}, ?MODULE, WorldData).
@@ -20,6 +20,12 @@ kill_everyone() ->
 
 populate(Data) ->
   super_super:populate(Data).
+
+make_rain(Data) ->
+  super_super:make_rain(Data).
+
+destroy_rain() ->
+  super_super:destroy_that_rain().
 
 init(WorldData) ->
   Arg = [ WorldData ],

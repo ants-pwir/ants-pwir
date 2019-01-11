@@ -10,9 +10,16 @@
 -behavior(gen_statem).
 -include("parametres.hrl").
 
+%uwagi piwowarczyka(do kogoś innego): program nie może się kończyć na wyjątku
+%lekki interfejs się przyda
+%mam błąd error:function_clause przy likwidacji mrówek, przepraszam :O
+%naprawię go dzisiaj
+
+%dodać zachowanie mrówek, kiedy zaczyna się deszcz
+%czyli notify wszystkie, żeby wróciły do swoich kolonii
 
 %% API
--export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3]).
+-export([ start_link/1, init/1, terminate/3, callback_mode/0, handle_info/3, code_change/4, loop/3,handle_event/4]).
 
 start_link(InState) ->
     gen_statem:start_link(?MODULE, InState, []).
@@ -27,7 +34,7 @@ init({WorldData, Place}) ->
 %here                    |   |
 %                       \     /
 %                        \   /
-    {ok, loop, State, 300}.
+    {ok, loop, State, 900}.
 
 terminate(_, _SName, State) ->
   stream_of_creation:notify(ant, an_ant_has_died, State),
@@ -36,7 +43,15 @@ terminate(_, _SName, State) ->
 callback_mode() ->
   state_functions.
 
+handle_event(info,rain_shutdown,State,Data) ->
+  io:format("EventType : ~p~nEventContent : ~p~nState : ~p~nData : ~p~n", [info,rain_shutdown,State,Data]),
+  {stop,normal,State}.
+
 handle_info(stop_sign, _SName, State) ->
+  {stop, normal, State};
+
+handle_info(rain_shutdown, _State, State) ->
+  stream_of_creation:notify(rain, hit_an_ant, State),
   {stop, normal, State};
 
 handle_info(_Info, SName, State) ->
@@ -75,8 +90,15 @@ loop(timeout, _, State) ->
       false
    end,
 
-  stream_of_creation:notify(ant, move, NState),
-  {next_state, loop,NState,300}.
+  RainEntity = is_there_rain(State),
+  case RainEntity of
+    {something} ->  stream_of_creation:notify(rain, hit_an_ant, State), {stop,normal,State};
+    _-> {next_state, loop, NState,900}
+  end;
+
+loop(info,stop_sign,State) ->
+  {stop,normal,State}.
+
 
 get_new_target(State, {nothing}, _NewPlace, {position, X, Y}) ->
   stream_of_creation:notify(ant, pheromone_noticed, State),
@@ -164,3 +186,22 @@ where_is_food(Pheromone) ->
   catch
     exit: _Reason -> where_is_food(Pheromone)
   end.
+
+is_there_rain(State) when erlang:abs((State#ant.place)#place.x - (State#ant.colony_place)#place.x) < ?COLONY_SIZE, erlang:abs((State#ant.place)#place.y - (State#ant.colony_place)#place.y) < ?COLONY_SIZE ->
+  {nothing};
+
+is_there_rain(State) ->
+  AllRain = supervisor:which_children(super_raindrop),
+  is_there_rain(State#ant.place, AllRain).
+
+is_there_rain(Place, [{_Id, Rain, _Type, _Modules} | Rest ]) ->
+  try gen_server:call(Rain, {are_you_at, Place}) of
+    true -> {something};
+    false ->
+      is_there_rain(Place, Rest)
+  catch
+    exit: _Reason -> is_there_rain(Place, Rest)
+  end;
+
+is_there_rain(_Position,[]) ->
+  {nothing}.

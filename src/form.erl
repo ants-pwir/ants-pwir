@@ -20,9 +20,9 @@ stop(_State) ->
 
 read()->
   Food = application:get_env(ants_pwir, food, 10),
-  Colonies = application:get_env(ants_pwir, colonies, [#colony{place = #place{x = 3, y = 3}, ant_population = ?MIN_ANTS}]),
-  Width = application:get_env(ants_pwir, width, 10),
-  Height = application:get_env(ants_pwir, height, 10),
+  Colonies = application:get_env(ants_pwir, colonies, [#colony{place = #place{x = 3, y = 3}, ant_population = ?MAX_ANTS}]),
+  Width = application:get_env(ants_pwir, width, ?WORLD_WIDTH),
+  Height = application:get_env(ants_pwir, height, ?WORLD_HEIGHT),
 
   #world_data{food = Food,
     colonies = Colonies,
