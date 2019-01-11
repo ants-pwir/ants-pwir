@@ -44,7 +44,7 @@ callback_mode() ->
   state_functions.
 
 handle_event(info,rain_shutdown,State,Data) ->
-  io:format("EtventType : ~p~nEventContent : ~p~nState : ~p~nData : ~p~n", [info,rain_shutdown,State,Data]),
+  io:format("EventType : ~p~nEventContent : ~p~nState : ~p~nData : ~p~n", [info,rain_shutdown,State,Data]),
   {stop,normal,State}.
 
 handle_info(stop_sign, _SName, State) ->
@@ -92,10 +92,9 @@ loop(timeout, _, State) ->
 
   RainEntity = is_there_rain(State),
   case RainEntity of
-    {something} ->  erlang:send_after(5, self(), rain_shutdown);
-    _-> stream_of_creation:notify(oooooo, oooooo, State)
-  end,
-  {next_state, loop, NState,900}.
+    {something} ->  stream_of_creation:notify(rain, hit_an_ant, State), {stop,normal,State};
+    _-> {next_state, loop, NState,900}
+  end.
 
 get_new_target(State, {nothing}, _NewPlace, {position, X, Y}) ->
   stream_of_creation:notify(ant, pheromone_noticed, State),

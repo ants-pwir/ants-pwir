@@ -31,7 +31,7 @@ init(WorldData) ->
   {ok,State}.
 
 terminate(_, State) ->
-  stream_of_creation:notify(food, has_been_eaten, State),
+  stream_of_creation:notify(food, gone, State),
   ok.
 
 code_change(_Old, State, _Add) ->
