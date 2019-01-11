@@ -45,7 +45,6 @@ handle_info(timeout, State) ->
   X =  rand:uniform(Width - 1),
   Y = rand:uniform(Height - 1),
   NewPlace = #place{x=X, y=Y},
-  %muszę coś zrobić, żeby po timeoucie nie zmieniały się współrzędne i żeby nie spadał znowu
   NewState = State#rain{place = NewPlace},
   stream_of_creation:notify(rain, falls_again, NewState),
   {noreply,NewState,900};
@@ -53,11 +52,14 @@ handle_info(timeout, State) ->
 handle_info(_Inf, State) ->
   {noreply, State}.
 
+handle_call({are_you}, _From, State) ->
+  {reply, true, State};
+
 handle_call({are_you_at, Place}, _From, State) ->
   {X, Y} = {(State#rain.place)#place.x, (State#rain.place)#place.y},
   Ans = case {Place#place.x, Place#place.y} of
           {X, Y} -> true;
           _      -> false
         end,
-  {reply, Ans, State,900}.
+  {reply, Ans, State}.
 

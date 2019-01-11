@@ -11,7 +11,6 @@
 -define(COLONY_SIZE, 3).
 -define(WORLD_WIDTH, 15).
 -define(WORLD_HEIGHT,15).
--define(IS_RAINING,false).
 
 %And there you have basic records
 
