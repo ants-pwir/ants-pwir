@@ -94,7 +94,11 @@ loop(timeout, _, State) ->
   case RainEntity of
     {something} ->  stream_of_creation:notify(rain, hit_an_ant, State), {stop,normal,State};
     _-> {next_state, loop, NState,900}
-  end.
+  end;
+
+loop(info,stop_sign,State) ->
+  {stop,normal,State}.
+
 
 get_new_target(State, {nothing}, _NewPlace, {position, X, Y}) ->
   stream_of_creation:notify(ant, pheromone_noticed, State),
