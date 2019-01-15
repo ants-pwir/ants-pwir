@@ -1,12 +1,11 @@
 %%%-------------------------------------------------------------------
 %%% @author karolinabogacka
 %%% @doc
-%%% I mean, it's basically an event stream, stream of creation just sounds cooler
+%%%
 %%% @end
 %%% Created : 02. Jan 2019 11:25
 %%%-------------------------------------------------------------------
 -module(stream_of_creation).
-%-behavior(gen_event).
 
 -export([ start_link/0,
   part_ready/1,
@@ -38,6 +37,3 @@ notify(Name, PID, Action, State) ->
 
 notify(Name, Action) ->
   gen_event:notify(?MODULE,{Name, Action}).
-
-%I'm not entirely sure, whether I won't get any weird bugs (:D) because of add_handler
-%let's see, anyways
