@@ -2,11 +2,9 @@
 %This is the place you want to go if you're dreaming of another, bigger ant colony
 %Or maybe a smaller one
 
--define(MIN_ANTS, 2).
 -define(MAX_ANTS, 5).
 -define(AVAILABLE_FOOD, 20).
 -define(PHEROMONE_TIME, 24000).
-%-define(RAIN_TIME, 24000).
 -define(RAIN_DENSITY, 10).
 -define(COLONY_SIZE, 3).
 -define(WORLD_WIDTH, 15).
