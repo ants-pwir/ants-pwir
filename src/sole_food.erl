@@ -11,7 +11,6 @@
 -include("parametres.hrl").
 -behavior(gen_server).
 
-
 %% API
 -export([ init/1, handle_call/3, terminate/2, code_change/3, start_link/1, handle_cast/2, handle_info/2]).
 

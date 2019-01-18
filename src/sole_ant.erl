@@ -61,9 +61,9 @@ loop(timeout, _, State) ->
 
    NState = case AskForIt of
                _ when ExistingRain ==true ->
-                 if NewPlace == State#ant.colony_place ->
+                 if erlang:abs(NewPlace#place.x - (State#ant.colony_place)#place.x) < ?COLONY_SIZE, erlang:abs(NewPlace#place.y - (State#ant.colony_place)#place.y) < ?COLONY_SIZE ->
                      stream_of_creation:notify(ant, at_colony, State);
-                 NewPlace /= State#ant.colony_place->
+                   erlang:abs(NewPlace#place.x - (State#ant.colony_place)#place.x) >= ?COLONY_SIZE, erlang:abs(NewPlace#place.y - (State#ant.colony_place)#place.y) >= ?COLONY_SIZE->
                      stream_of_creation:notify(ant,returning_to_colony,State);
                  true -> false
                  end,
@@ -90,7 +90,7 @@ loop(timeout, _, State) ->
   RainEntity = is_there_rain(State),
   case RainEntity of
     {something} ->  stream_of_creation:notify(rain, hit_an_ant, State), {stop,normal,State};
-    _-> {next_state, loop, NState,900}
+    _-> stream_of_creation:notify(ant, next_state, State),{next_state, loop, NState,900}
   end;
 
 loop(info,stop_sign,State) ->
