@@ -51,7 +51,7 @@ handle_info(read_from, State) ->
   io:fwrite("Wpisz sa żeby rozpocząć ruch mrówek, ea żeby go zakończyć. ~n",[]),
   io:fwrite("Wpisz sr żeby rozpocząć deszcz, er żeby go zakończyć. ~n",[]),
   io:fwrite("Wpisz gd aby uzyskać dane symulacji. ~n",[]),
-  P=io:get_chars("command>",N).
+  P=io:get_chars("command>",2),
   stream_of_creation:notify(P,State),
   case P of
     "sa" ->
