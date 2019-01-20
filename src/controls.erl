@@ -20,6 +20,7 @@
 -export([init/1, handle_call/3, terminate/2, code_change/3, handle_cast/2, handle_info/2, start_link/1, start_ants/0, stop_ants/0, get_data/0,start_rain/0,stop_rain/0]).
 
 start_link(WorldData) ->
+  user:main(),
   gen_server:start_link({local, ?MODULE}, ?MODULE, WorldData, []).
 
 start_ants() ->
