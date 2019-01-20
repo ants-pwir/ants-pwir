@@ -20,7 +20,6 @@
 -export([init/1, handle_call/3, terminate/2, code_change/3, handle_cast/2, handle_info/2, start_link/1, start_ants/0, stop_ants/0, get_data/0,start_rain/0,stop_rain/0]).
 
 start_link(WorldData) ->
-  user:main(),
   gen_server:start_link({local, ?MODULE}, ?MODULE, WorldData, []).
 
 start_ants() ->
@@ -47,11 +46,51 @@ code_change(_OldVsn, State, _Extra) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
+read_chars(P,N)->
+  P=io:get_chars("command>",N).
+
+handle_info(read_from, State) ->
+  io:fwrite("Aplikacja symulująca zachowanie mrówek w trakcie deszczu. ~n",[]),
+  io:fwrite("Wpisz sa żeby rozpocząć ruch mrówek, ea żeby go zakończyć. ~n",[]),
+  io:fwrite("Wpisz sr żeby rozpocząć deszcz, er żeby go zakończyć. ~n",[]),
+  io:fwrite("Wpisz gd aby uzyskać dane symulacji. ~n",[]),
+  P="",
+  read_chars(P,2),
+  stream_of_creation:notify(P,State),
+  case P of
+    "sa" ->
+      io:fwrite("Zacząłeś ruch mrówek. ~n",[]),
+      gen_server:call(?MODULE,start_ants );
+    "ea" ->
+      io:fwrite("Zakończyłeś ruch mrówek",[]),
+      gen_server:call(?MODULE, stop_ants);
+    "sr" ->
+      io:fwrite("Zacząłeś deszcz",[]),
+      gen_server:call(?MODULE, start_rain);
+    "er" ->
+      io:fwrite("Zakończyłeś deszcz",[]),
+      gen_server:call(?MODULE, stop_rain);
+    "gd" ->
+      io:fwrite("Dane symulacji",[]),
+      gen_server:call(?MODULE, get_data);
+    "" ->
+      io:fwrite("Nic nie podałeś",[]);
+    true ->
+      io:fwrite("Nieznana komenda",[])
+  end,
+  io:fwrite("Aplikacja symulująca zachowanie mrówek w trakcie deszczu. ~n",[]),
+  io:fwrite("Wpisz sa żeby rozpocząć ruch mrówek, ea żeby go zakończyć. ~n",[]),
+  io:fwrite("Wpisz sr żeby rozpocząć deszcz, er żeby go zakończyć. ~n",[]),
+  io:fwrite("Wpisz gd aby uzyskać dane symulacji. ~n",[]),
+  erlang:send_after(5, self(), read_from),
+  {ok, State};
+
 handle_info(_Info, State) ->
   {noreply, State}.
 
 init(WorldData) ->
   stream_of_creation:part_ready(?MODULE),
+  erlang:send_after(200, self(), read_from),
   {ok, {stopped, no_rain, WorldData}}.
 
 handle_call(start_ants, _From, {stopped, Rain, WorldData}) ->
