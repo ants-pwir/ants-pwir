@@ -46,16 +46,12 @@ code_change(_OldVsn, State, _Extra) ->
 handle_cast(_Request, State) ->
   {noreply, State}.
 
-read_chars(P,N)->
-  P=io:get_chars("command>",N).
-
 handle_info(read_from, State) ->
   io:fwrite("Aplikacja symulująca zachowanie mrówek w trakcie deszczu. ~n",[]),
   io:fwrite("Wpisz sa żeby rozpocząć ruch mrówek, ea żeby go zakończyć. ~n",[]),
   io:fwrite("Wpisz sr żeby rozpocząć deszcz, er żeby go zakończyć. ~n",[]),
   io:fwrite("Wpisz gd aby uzyskać dane symulacji. ~n",[]),
-  P="",
-  read_chars(P,2),
+  P=io:get_chars("command>",N).
   stream_of_creation:notify(P,State),
   case P of
     "sa" ->
